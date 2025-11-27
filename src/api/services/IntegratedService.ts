@@ -38,6 +38,23 @@ export interface OrderDetail {
     progressPercentage: number;
 };
 
+export interface ScanRequest {
+    partNumber: string;
+    weekNumber: number;
+};
+
+export interface ScanResponse {
+    success: boolean;
+    message: string;
+    partNumber: string;
+    scannedQuantity: number;
+    requiredQuantity: number;
+    completed: boolean;
+    remaining: number;
+    progressPercentage: number;
+    order?: OrderDetail;
+};
+
 export interface ApiResponse<T> {
     success: boolean;
     message: string;
@@ -45,6 +62,7 @@ export interface ApiResponse<T> {
 };
 
 class IntegratedService {
+    private scanEndpoint = API_CONFIG.endpoints.integrated.scan;
     private productionOrderEndpoint = API_CONFIG.endpoints.integrated.productionOrderIncrease;
     private weekSummaryEndpoint = API_CONFIG.endpoints.integrated.weeksSummary;
     private weekByNumberEndpoint = API_CONFIG.endpoints.integrated.weekByNumber;
@@ -56,6 +74,10 @@ class IntegratedService {
 
     async getWeekDetail(weekNumber: number): Promise<ApiResponse<OrderDetail[]>> {
         return apiClient.get<ApiResponse<OrderDetail[]>>(`${this.weekByNumberEndpoint}${weekNumber}`);
+    };
+
+    async scanPart(request: ScanRequest): Promise<ScanResponse> {
+        return apiClient.post(this.scanEndpoint, request);
     };
 
     async productionOrder(formData: ProductionOrderForm): Promise<ProductionOrderResponse> {

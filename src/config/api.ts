@@ -8,6 +8,7 @@ export const API_CONFIG = {
     baseUrl: API_BASE_URL,
     endpoints: {
         integrated: {
+            scan: "/api/Integrated/Scan",
             productionOrderIncrease: "/api/Integrated/ProductionOrderIncrease",
             weeksSummary: "/api/Integrated/Weeks/summary",
             weekByNumber: "/api/Integrated/Week/"

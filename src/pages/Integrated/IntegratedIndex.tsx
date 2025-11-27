@@ -1,10 +1,11 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Modal } from "../../components/Modal/Modal";
 import { ProductionOrderForm } from "../../components/ProductionOrderForm/ProductionOrderForm";
 import { useWeeksSummary } from "../../hooks/useWeeksSummary";
 import { useWeekDetails } from "../../hooks/useWeekDetails";
 import { Tabs } from "../../components/Tabs/Tabs";
 import { OrderCard } from "../../components/OrderCard/OrderCard";
+import { ScanInput } from "../../components/ScanInput/ScanInput";
 
 export const IntegratedIndex = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -28,6 +29,20 @@ export const IntegratedIndex = () => {
     const handleWeekSelect = (weekNumber: number) => {
         setSelectedWeek(weekNumber);
     };
+
+    const handleScanSuccess = (scanResult: any) => {
+        console.log('Escaneo exitoso:', scanResult);
+        refetchOrders();
+
+        if (scanResult.completed) {
+        }
+    };
+
+    useEffect(() => {
+        if (weeks.length > 0 && !selectedWeek) {
+            setSelectedWeek(weeks[0].weekNumber);
+        }
+    }, [weeks, selectedWeek]);
 
     return (
         <div className="min-h-screen bg-gray-50 py-8">
@@ -79,35 +94,35 @@ export const IntegratedIndex = () => {
                         )
                     }
 
-                    {
-                        selectedWeek && (
-                            <div className="mt-6">
-                                {
-                                    ordersLoading ? (
-                                        <div className="text-center py-4">
-                                            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
-                                            <p className="mt-2 text-gray-600">Cargando órdenes...</p>
-                                        </div>
-                                    ) : ordersError ? (
-                                        <div className="bg-red-50 border border-e-red-200 rounded-md p-4">
-                                            <p className="text-red-700">Error: {ordersError}</p>
-                                        </div>
-                                    ) : (
-                                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                                            {
-                                                orders.map((orders) => (
-                                                    <OrderCard
-                                                        key={orders.id}
-                                                        order={orders}
-                                                    />
-                                                ))
-                                            }
-                                        </div>
-                                    )
-                                }
-                            </div>
-                        )
-                    }
+                    {selectedWeek && (
+                        <div className="mt-6">
+                            <ScanInput
+                                weekNumber={selectedWeek}
+                                onScanSuccess={handleScanSuccess}
+                                disabled={ordersLoading}
+                            />
+
+                            {ordersLoading ? (
+                                <div className="text-center py-4">
+                                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
+                                    <p className="mt-2 text-gray-600">Cargando órdenes...</p>
+                                </div>
+                            ) : ordersError ? (
+                                <div className="bg-red-50 border border-red-200 rounded-md p-4">
+                                    <p className="text-red-700">Error: {ordersError}</p>
+                                </div>
+                            ) : (
+                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                                    {orders.map((order) => (
+                                        <OrderCard
+                                            key={order.id}
+                                            order={order}
+                                        />
+                                    ))}
+                                </div>
+                            )}
+                        </div>
+                    )}
                 </div>
             </div>
 
