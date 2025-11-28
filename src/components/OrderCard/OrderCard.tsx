@@ -77,13 +77,22 @@ export const OrderCard = ({ order, onDelete, isRecent = false, position }: Order
             <div className="mb-3">
                 <div className="flex justify-between text-sm text-gray-600 mb-1">
                     <span>Progreso</span>
-                    <span>{order.scannedQuantity}/{order.amount} ({order.remaining} restantes)</span>
+                    <span>
+                        {order.scannedQuantity}/{order.amount}
+                        <span className="text-gray-400 ml-1">
+                            ({order.remaining} restantes)
+                        </span>
+                    </span>
                 </div>
                 <div className="w-full bg-gray-200 rounded-full h-2">
                     <div
                         className={`h-2 rounded-full transition-all duration-500 ${getProgressColor(order.progressPercentage)}`}
                         style={{ width: `${Math.min(order.progressPercentage, 100)}%` }}
                     ></div>
+                </div>
+                <div className="flex justify-between text-xs text-gray-500 mt-1">
+                    <span>{Math.round(order.progressPercentage)}% completado</span>
+                    <span>{order.remaining} por escanear</span>
                 </div>
             </div>
 

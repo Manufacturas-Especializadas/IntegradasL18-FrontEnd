@@ -6,7 +6,7 @@ export const useScan = () => {
     const [scanResult, setScanResult] = useState<ScanResponse | null>(null);
     const [scanError, setScanError] = useState<string | null>(null);
 
-    const scanPart = async (partNumber: string, weekNumber: number) => {
+    const scanPart = async (partNumber: string, weekNumber: number, quantity: number) => {
         setScanning(true);
         setScanError(null);
         setScanResult(null);
@@ -14,7 +14,8 @@ export const useScan = () => {
         try {
             const request: ScanRequest = {
                 partNumber: partNumber.trim(),
-                weekNumber
+                weekNumber,
+                quantity
             };
 
             const result = await integratedService.scanPart(request);

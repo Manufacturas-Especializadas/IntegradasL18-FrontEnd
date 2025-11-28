@@ -41,6 +41,7 @@ export interface OrderDetail {
 export interface ScanRequest {
     partNumber: string;
     weekNumber: number;
+    quantity: number;
 };
 
 export interface ScanResponse {
@@ -49,6 +50,7 @@ export interface ScanResponse {
     partNumber: string;
     scannedQuantity: number;
     requiredQuantity: number;
+    addedQuantity: number;
     completed: boolean;
     remaining: number;
     progressPercentage: number;
