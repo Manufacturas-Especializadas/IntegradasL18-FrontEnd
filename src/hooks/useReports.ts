@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
-import { integratedService, type OrderDetail, type OrderSummary } from "../api/services/IntegratedService";
+import { useState, useEffect } from 'react';
+import { integratedService, type OrderDetail, type OrderSummary } from '../api/services/IntegratedService';
 
 
 export const useReports = () => {
@@ -7,6 +7,7 @@ export const useReports = () => {
     const [selectedWeek, setSelectedWeek] = useState<number | null>(null);
     const [weekDetails, setWeekDetails] = useState<OrderDetail[]>([]);
     const [loading, setLoading] = useState(false);
+    const [detailsLoading, setDetailsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
     const loadWeeksSummary = async () => {
@@ -14,9 +15,14 @@ export const useReports = () => {
             setLoading(true);
             setError(null);
             const response = await integratedService.getWeeksSummary();
-            setWeeks(response.data);
+            const sortedWeeks = response.data.sort((a, b) => b.weekNumber - a.weekNumber);
+            setWeeks(sortedWeeks);
+
+            if (sortedWeeks.length > 0 && !selectedWeek) {
+                await loadWeekDetails(sortedWeeks[0].weekNumber);
+            }
         } catch (err) {
-            setError(err instanceof Error ? err.message : "Error al cargar las semanas");
+            setError(err instanceof Error ? err.message : 'Error al cargar las semanas');
         } finally {
             setLoading(false);
         }
@@ -24,15 +30,15 @@ export const useReports = () => {
 
     const loadWeekDetails = async (weekNumber: number) => {
         try {
-            setLoading(true);
+            setDetailsLoading(true);
             setError(null);
             const response = await integratedService.getWeekDetail(weekNumber);
             setWeekDetails(response.data);
             setSelectedWeek(weekNumber);
         } catch (err) {
-            setError(err instanceof Error ? err.message : "Error al cargar los detalles");
+            setError(err instanceof Error ? err.message : 'Error al cargar los detalles');
         } finally {
-            setLoading(false);
+            setDetailsLoading(false);
         }
     };
 
@@ -55,6 +61,7 @@ export const useReports = () => {
         selectedWeek,
         weekDetails,
         loading,
+        detailsLoading,
         error,
         loadWeekDetails,
         downloadReport,

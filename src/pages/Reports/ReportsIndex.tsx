@@ -1,14 +1,25 @@
 import { useState } from "react";
-import { LoadingSpinner } from "../../components/LoadingSpinner/LoadingSpinner";
-import { ErrorAlert } from "../../components/ErrorAlert/ErrorAlert";
-import { WeekCard } from "../../components/WeekCard/WeekCard";
-import { WeekDetails } from "../../components/WeekDetails/WeekDetails";
 import { useReports } from "../../hooks/useReports";
+import { ErrorAlert } from "../../components/ErrorAlert/ErrorAlert";
+import { WeekSelector } from "../../components/WeekSelector/WeekSelector";
+import { LoadingSpinner } from "../../components/LoadingSpinner/LoadingSpinner";
+import { WeekDetails } from "../../components/WeekDetails/WeekDetails";
 import { useNavigate } from "react-router-dom";
 
 
 export const ReportsIndex = () => {
-    const { weeks, selectedWeek, weekDetails, loading, error, loadWeekDetails, downloadReport, refreshWeeks } = useReports();
+    const {
+        weeks,
+        selectedWeek,
+        weekDetails,
+        loading,
+        detailsLoading,
+        error,
+        loadWeekDetails,
+        downloadReport,
+        refreshWeeks
+    } = useReports();
+
     const [downloading, setDownloading] = useState<number | null>(null);
     const navigate = useNavigate();
 
@@ -26,16 +37,6 @@ export const ReportsIndex = () => {
     const handleWeekSelect = (weekNumber: number) => {
         loadWeekDetails(weekNumber);
     };
-
-    if (loading && weeks.length === 0) {
-        return (
-            <div className="min-h-screen bg-gray-50 py-8">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <LoadingSpinner />
-                </div>
-            </div>
-        );
-    }
 
     return (
         <div className="min-h-screen bg-gray-50 py-8">
@@ -58,7 +59,7 @@ export const ReportsIndex = () => {
                     <button
                         onClick={() => navigate("/")}
                         className="flex items-center justify-center w-10 h-10 bg-white rounded-full shadow-md hover:bg-gray-50 
-                            transition-colors duration-200 hover:cursor-pointer border border-gray-200"
+                        transition-colors duration-200 hover:cursor-pointer border border-gray-200"
                         aria-label="Volver atrás"
                     >
                         <svg
@@ -77,49 +78,72 @@ export const ReportsIndex = () => {
                     </button>
                 </div>
 
-                <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
-                    <div className="xl:col-span-1">
+                <div className="block lg:hidden space-y-6">
+                    <WeekSelector
+                        weeks={weeks}
+                        selectedWeek={selectedWeek}
+                        onWeekSelect={handleWeekSelect}
+                        loading={loading}
+                    />
+
+                    {selectedWeek ? (
+                        <>
+                            {detailsLoading ? (
+                                <div className="bg-white rounded-xl shadow-lg p-8">
+                                    <LoadingSpinner />
+                                </div>
+                            ) : (
+                                <WeekDetails
+                                    weekNumber={selectedWeek}
+                                    details={weekDetails}
+                                    onDownload={handleDownload}
+                                />
+                            )}
+                        </>
+                    ) : (
+                        <div className="bg-white rounded-xl shadow-lg border border-gray-200 p-12 text-center">
+                            <svg className="mx-auto h-16 w-16 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                            </svg>
+                            <h3 className="mt-4 text-xl font-medium text-gray-900">Selecciona una semana</h3>
+                            <p className="mt-2 text-gray-500">
+                                Elige una semana de la lista para ver los detalles.
+                            </p>
+                        </div>
+                    )}
+                </div>
+
+                <div className="hidden lg:grid lg:grid-cols-4 xl:grid-cols-5 gap-8">
+                    <div className="lg:col-span-1 xl:col-span-1">
                         <div className="sticky top-8">
-                            <div className="flex justify-between items-center mb-6">
-                                <h2 className="text-xl font-semibold text-gray-800">Semanas</h2>
+                            <div className="flex justify-between items-center mb-4">
+                                <h2 className="text-lg font-semibold text-gray-800">Semanas</h2>
                                 <button
                                     onClick={refreshWeeks}
-                                    className="px-4 py-2 bg-white border border-gray-300 rounded-lg text-gray-700 
-                                    hover:bg-gray-50 transition-colors text-sm font-medium hover:cursor-pointer"
+                                    className="p-2 bg-white border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
+                                    title="Actualizar lista"
                                 >
-                                    Actualizar
+                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                                    </svg>
                                 </button>
                             </div>
-
-                            <div className="space-y-4">
-                                {weeks.map((week) => (
-                                    <WeekCard
-                                        key={week.weekNumber}
-                                        week={week}
-                                        onSelect={handleWeekSelect}
-                                        onDownload={handleDownload}
-                                        isSelected={selectedWeek === week.weekNumber}
-                                    />
-                                ))}
-
-                                {weeks.length === 0 && !loading && (
-                                    <div className="text-center py-12 bg-white rounded-xl shadow-sm border border-gray-200">
-                                        <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                                        </svg>
-                                        <h3 className="mt-4 text-lg font-medium text-gray-900">No hay semanas disponibles</h3>
-                                        <p className="mt-2 text-gray-500">No se encontraron reportes de semanas de producción.</p>
-                                    </div>
-                                )}
-                            </div>
+                            <WeekSelector
+                                weeks={weeks}
+                                selectedWeek={selectedWeek}
+                                onWeekSelect={handleWeekSelect}
+                                loading={loading}
+                            />
                         </div>
                     </div>
 
-                    <div className="xl:col-span-2">
+                    <div className="lg:col-span-3 xl:col-span-4">
                         {selectedWeek ? (
                             <>
-                                {loading ? (
-                                    <LoadingSpinner />
+                                {detailsLoading ? (
+                                    <div className="bg-white rounded-xl shadow-lg p-12">
+                                        <LoadingSpinner />
+                                    </div>
                                 ) : (
                                     <WeekDetails
                                         weekNumber={selectedWeek}
@@ -129,7 +153,7 @@ export const ReportsIndex = () => {
                                 )}
                             </>
                         ) : (
-                            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-12 text-center">
+                            <div className="bg-white rounded-xl shadow-lg border border-gray-200 p-12 text-center">
                                 <svg className="mx-auto h-16 w-16 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                                 </svg>
