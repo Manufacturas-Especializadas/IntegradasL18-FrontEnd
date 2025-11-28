@@ -1,4 +1,3 @@
-// pages/IntegratedIndex.tsx
 import { useState, useEffect } from "react";
 import { Modal } from "../../components/Modal/Modal";
 import { ProductionOrderForm } from "../../components/ProductionOrderForm/ProductionOrderForm";
@@ -37,23 +36,20 @@ export const IntegratedIndex = () => {
 
     const handleWeekSelect = (weekNumber: number) => {
         setSelectedWeek(weekNumber);
-        setRecentlyScanned([]); // Limpiar la lista de escaneos recientes al cambiar de semana
+        setRecentlyScanned([]);
     };
 
     const handleScanSuccess = (scanResult: any) => {
         console.log('Escaneo exitoso:', scanResult);
 
         if (scanResult.order) {
-            // Actualizar la orden en el estado local
             updateOrder(scanResult.order);
 
-            // Mover la orden al principio
             moveOrderToTop(scanResult.order.id);
 
-            // Agregar a la lista de escaneos recientes (para efectos visuales)
             setRecentlyScanned(prev => {
                 const newList = [scanResult.order.id, ...prev.filter(id => id !== scanResult.order.id)];
-                return newList.slice(0, 5); // Mantener solo los 5 más recientes
+                return newList.slice(0, 5);
             });
         }
 
@@ -127,10 +123,8 @@ export const IntegratedIndex = () => {
                         />
                     )}
 
-                    {/* Contenido de la semana seleccionada */}
                     {selectedWeek && (
                         <div className="mt-6">
-                            {/* Input de escaneo */}
                             <ScanInput
                                 weekNumber={selectedWeek}
                                 onScanSuccess={handleScanSuccess}
