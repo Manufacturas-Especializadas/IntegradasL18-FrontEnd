@@ -11,13 +11,12 @@ interface OrderCardProps {
 export const OrderCard = ({ order, onDelete, isRecent = false, position }: OrderCardProps) => {
     const [isHighlighted, setIsHighlighted] = useState(false);
 
-    // Efecto para resaltar la card cuando es reciente
     useEffect(() => {
         if (isRecent) {
             setIsHighlighted(true);
             const timer = setTimeout(() => {
                 setIsHighlighted(false);
-            }, 2000); // Remover el resaltado después de 2 segundos
+            }, 2000);
 
             return () => clearTimeout(timer);
         }
@@ -44,7 +43,6 @@ export const OrderCard = ({ order, onDelete, isRecent = false, position }: Order
             }
             ${position === 1 ? 'ring-2 ring-blue-400' : ''}
         `}>
-            {/* Indicador de posición reciente */}
             {isHighlighted && (
                 <div className="absolute -top-2 -right-2">
                     <span className="bg-blue-500 text-white text-xs font-bold px-2 py-1 rounded-full animate-pulse">
@@ -53,7 +51,6 @@ export const OrderCard = ({ order, onDelete, isRecent = false, position }: Order
                 </div>
             )}
 
-            {/* Indicador de posición en el grid */}
             {position && position <= 3 && (
                 <div className="absolute -top-2 -left-2">
                     <span className={`
