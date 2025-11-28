@@ -6,11 +6,13 @@ import { OrderCard } from "../../components/OrderCard/OrderCard";
 import { ScanInput } from "../../components/ScanInput/ScanInput";
 import { useWeeksSummary } from "../../hooks/useWeeksSummary";
 import { useWeekDetails } from "../../hooks/useWeekDetails";
+import { useNavigate } from "react-router-dom";
 
 export const IntegratedIndex = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedWeek, setSelectedWeek] = useState<number | null>(null);
     const [recentlyScanned, setRecentlyScanned] = useState<number[]>([]);
+    const navigate = useNavigate();
 
     const { weeks, loading: weeksLoading, error: weeksError, refetch: refetchWeeks } = useWeeksSummary();
     const {
@@ -94,16 +96,25 @@ export const IntegratedIndex = () => {
                                 Gestiona las órdenes de producción por semana
                             </p>
                         </div>
-                        <button
-                            onClick={handleOpenModal}
-                            className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-medium transition-colors 
-                                duration-200 shadow-md flex items-center hover:shadow-lg transform hover:-translate-y-0.5 hover:cursor-pointer"
-                        >
-                            <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                            </svg>
-                            Nueva orden
-                        </button>
+                        <div className="flex justify-end gap-3">
+                            <button
+                                onClick={() => navigate("/reportes")}
+                                className="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-lg font-medium transition-colors 
+                                    duration-200 shadow-md flex items-center hover:shadow-lg transform hover:-translate-y-0.5 hover:cursor-pointer"
+                            >
+                                Reportes
+                            </button>
+                            <button
+                                onClick={handleOpenModal}
+                                className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-medium transition-colors 
+                                    duration-200 shadow-md flex items-center hover:shadow-lg transform hover:-translate-y-0.5 hover:cursor-pointer"
+                            >
+                                <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                                </svg>
+                                Nueva orden
+                            </button>
+                        </div>
                     </div>
 
                     {weeksLoading ? (

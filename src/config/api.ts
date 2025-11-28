@@ -10,6 +10,7 @@ export const API_CONFIG = {
         integrated: {
             scan: "/api/Integrated/Scan",
             productionOrderIncrease: "/api/Integrated/ProductionOrderIncrease",
+            generateReport: "/api/Integrated/GenerateReport/",
             weeksSummary: "/api/Integrated/Weeks/summary",
             weekByNumber: "/api/Integrated/Week/"
         }

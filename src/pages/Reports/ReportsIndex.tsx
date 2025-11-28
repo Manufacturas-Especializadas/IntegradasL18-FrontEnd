@@ -1,0 +1,161 @@
+import { useState } from "react";
+import { LoadingSpinner } from "../../components/LoadingSpinner/LoadingSpinner";
+import { ErrorAlert } from "../../components/ErrorAlert/ErrorAlert";
+import { WeekCard } from "../../components/WeekCard/WeekCard";
+import { WeekDetails } from "../../components/WeekDetails/WeekDetails";
+import { useReports } from "../../hooks/useReports";
+import { useNavigate } from "react-router-dom";
+
+
+export const ReportsIndex = () => {
+    const { weeks, selectedWeek, weekDetails, loading, error, loadWeekDetails, downloadReport, refreshWeeks } = useReports();
+    const [downloading, setDownloading] = useState<number | null>(null);
+    const navigate = useNavigate();
+
+    const handleDownload = async (weekNumber: number, type: 'detailed' | 'summary') => {
+        try {
+            setDownloading(weekNumber);
+            await downloadReport(weekNumber, type);
+        } catch (err) {
+            console.error('Download error:', err);
+        } finally {
+            setDownloading(null);
+        }
+    };
+
+    const handleWeekSelect = (weekNumber: number) => {
+        loadWeekDetails(weekNumber);
+    };
+
+    if (loading && weeks.length === 0) {
+        return (
+            <div className="min-h-screen bg-gray-50 py-8">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <LoadingSpinner />
+                </div>
+            </div>
+        );
+    }
+
+    return (
+        <div className="min-h-screen bg-gray-50 py-8">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div className="mb-8">
+                    <h1 className="text-3xl font-bold text-gray-900 mb-2">Reportes de Producción</h1>
+                    <p className="text-gray-600">
+                        Sistema de gestión y seguimiento de órdenes de producción semanales
+                    </p>
+                </div>
+
+                {error && (
+                    <ErrorAlert
+                        message={error}
+                        onRetry={refreshWeeks}
+                    />
+                )}
+
+                <div className="mb-4">
+                    <button
+                        onClick={() => navigate("/")}
+                        className="flex items-center justify-center w-10 h-10 bg-white rounded-full shadow-md hover:bg-gray-50 
+                            transition-colors duration-200 hover:cursor-pointer border border-gray-200"
+                        aria-label="Volver atrás"
+                    >
+                        <svg
+                            className="w-5 h-5 text-gray-600"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                        >
+                            <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M10 19l-7-7m0 0l7-7m-7 7h18"
+                            />
+                        </svg>
+                    </button>
+                </div>
+
+                <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
+                    <div className="xl:col-span-1">
+                        <div className="sticky top-8">
+                            <div className="flex justify-between items-center mb-6">
+                                <h2 className="text-xl font-semibold text-gray-800">Semanas</h2>
+                                <button
+                                    onClick={refreshWeeks}
+                                    className="px-4 py-2 bg-white border border-gray-300 rounded-lg text-gray-700 
+                                    hover:bg-gray-50 transition-colors text-sm font-medium hover:cursor-pointer"
+                                >
+                                    Actualizar
+                                </button>
+                            </div>
+
+                            <div className="space-y-4">
+                                {weeks.map((week) => (
+                                    <WeekCard
+                                        key={week.weekNumber}
+                                        week={week}
+                                        onSelect={handleWeekSelect}
+                                        onDownload={handleDownload}
+                                        isSelected={selectedWeek === week.weekNumber}
+                                    />
+                                ))}
+
+                                {weeks.length === 0 && !loading && (
+                                    <div className="text-center py-12 bg-white rounded-xl shadow-sm border border-gray-200">
+                                        <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                        </svg>
+                                        <h3 className="mt-4 text-lg font-medium text-gray-900">No hay semanas disponibles</h3>
+                                        <p className="mt-2 text-gray-500">No se encontraron reportes de semanas de producción.</p>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="xl:col-span-2">
+                        {selectedWeek ? (
+                            <>
+                                {loading ? (
+                                    <LoadingSpinner />
+                                ) : (
+                                    <WeekDetails
+                                        weekNumber={selectedWeek}
+                                        details={weekDetails}
+                                        onDownload={handleDownload}
+                                    />
+                                )}
+                            </>
+                        ) : (
+                            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-12 text-center">
+                                <svg className="mx-auto h-16 w-16 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                </svg>
+                                <h3 className="mt-4 text-xl font-medium text-gray-900">Selecciona una semana</h3>
+                                <p className="mt-2 text-gray-500">
+                                    Elige una semana de la lista para ver los detalles y descargar reportes.
+                                </p>
+                            </div>
+                        )}
+                    </div>
+                </div>
+
+                {downloading && (
+                    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                        <div className="bg-white rounded-xl p-6 max-w-sm mx-4">
+                            <div className="flex items-center gap-3">
+                                <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
+                                <div>
+                                    <p className="font-medium text-gray-900">Descargando reporte</p>
+                                    <p className="text-sm text-gray-600">Semana {downloading}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                )}
+            </div>
+        </div>
+    );
+};

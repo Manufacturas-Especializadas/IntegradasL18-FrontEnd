@@ -66,6 +66,7 @@ export interface ApiResponse<T> {
 class IntegratedService {
     private scanEndpoint = API_CONFIG.endpoints.integrated.scan;
     private productionOrderEndpoint = API_CONFIG.endpoints.integrated.productionOrderIncrease;
+    private generateReportEndpoint = API_CONFIG.endpoints.integrated.generateReport;
     private weekSummaryEndpoint = API_CONFIG.endpoints.integrated.weeksSummary;
     private weekByNumberEndpoint = API_CONFIG.endpoints.integrated.weekByNumber;
 
@@ -93,6 +94,13 @@ class IntegratedService {
         );
 
         return response;
+    };
+
+    async downloadReport(weekNumber: number, reportType: 'detailed' | 'summary' = 'detailed'): Promise<void> {
+        const endpoint = `${this.generateReportEndpoint}${weekNumber}?reportType=${reportType}`;
+        const filename = `Reporte_Semana_${weekNumber}_${reportType}_${new Date().toISOString().split('T')[0]}.xlsx`;
+
+        await apiClient.downloadFile(endpoint, filename);
     };
 };
 
